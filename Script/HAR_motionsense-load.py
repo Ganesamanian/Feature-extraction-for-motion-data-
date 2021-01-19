@@ -1,10 +1,18 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# ## Working code
+# 
+# ### Created on Thursday  October 22, 2020
+# 
+# ### Author: Ganesamanian Kolappan
+# 
+
+# ## Importing libraries
+# 
+
+# ##### Importing the libraries to be used in the whole application, for the neatness of the code all the imports are done at the start of the coding.
 
 # In[1]:
-
 
 import numpy as np
 from numpy import fft
@@ -29,10 +37,15 @@ from keras.layers import Dense, Dropout, Activation, LSTM, Input, RepeatVector, 
 
 # In[5]:
 
+#Data path
 
 root = 'datasets/motion-sense-master/data/'
-window_size = 250
+
+#Windowing variables
+
 time_step  = 2
+window_size = 250
+
 
 
 # In[3]:
@@ -84,14 +97,14 @@ def confusion_Matrix(y_test, predict, activities, title):
 # In[ ]:
 
 
-# test_features = np.hstack((mean_test_data, std_test_data, var_test_data,
-#                           cor_test_data, abdev_test_data, maxpeak_test_data, 
-#                           minpeak_test_data, fft_test_data ))
+test_features = np.hstack((mean_test_data, std_test_data, var_test_data,
+                          cor_test_data, abdev_test_data, maxpeak_test_data, 
+                          minpeak_test_data, fft_test_data ))
 
 
-# label = np.asarray(label)
+label = np.asarray(label)
 
-# predict, y_test = classification_Using_SVM(np.nan_to_num(test_features), label)
+predict, y_test = classification_Using_SVM(np.nan_to_num(test_features), label)
 
 
 # In[7]:
@@ -104,22 +117,22 @@ test_activities = ['Walking', 'Jogging', 'Sitting',
 # In[10]:
 
 
-# predict, y_test = classification_Using_SVM(np.nan_to_num(test_features), label)
-# print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-# print(metrics.classification_report(y_test, predict, labels=test_activities))
+predict, y_test = classification_Using_SVM(np.nan_to_num(test_features), label)
+print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
+print(metrics.classification_report(y_test, predict, labels=test_activities))
 
 
 # In[ ]:
 
 
-with open("motionsense_data_"+str(time_step)+"_"+str(window_size)+".pkl", "rb") as f:
-    test_data = np.asarray(pickle.loads(f.read()))
+# with open("motionsense_data_"+str(time_step)+"_"+str(window_size)+".pkl", "rb") as f:
+#     test_data = np.asarray(pickle.loads(f.read()))
 
-with open("motionsense_label_"+str(time_step)+"_"+str(window_size)+".pkl", "rb") as f:
-    label = np.asarray(pickle.loads(f.read()))
+# with open("motionsense_label_"+str(time_step)+"_"+str(window_size)+".pkl", "rb") as f:
+#     label = np.asarray(pickle.loads(f.read()))
 
-print("Shape of the data after sliding window")
-print(test_data.shape)
+# print("Shape of the data after sliding window")
+# print(test_data.shape)
 
 
 # In[ ]:
@@ -127,17 +140,17 @@ print(test_data.shape)
 
 def autoencoder(total_data, activation_fn, num_features, epoch, batch_n):
     input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
-    encoder = LSTM(num_features, activation=activation_fn, kernel_initializer="he_uniform")(input_layer)
-    #encoder = LSTM(180, activation='sigmoid')(encoder)
+    encoder = LSTM((num_features*2), activation=activation_fn, kernel_initializer="he_uniform")(input_layer)
+    encoder = LSTM(num_features, activation=activation_fn, kernel_initializer="he_uniform")(encoder)
     decoder = RepeatVector(total_data.shape[1])(encoder)
-    #decoder = LSTM(96, return_sequences=True, 
-    #               activation='sigmoid')(decoder)
-    decoder = LSTM(total_data.shape[2], return_sequences=True, 
+    decoder = LSTM(num_features, return_sequences=True, 
                    activation=activation_fn, kernel_initializer="he_uniform")(decoder)
-    autoencoder = Model(inputs=input_layer, outputs=decoder)
-#     output = TimeDistributed(Dense(total_data.shape[2]))(decoder) 
+    decoder = LSTM((num_features*2), return_sequences=True, 
+                   activation=activation_fn, kernel_initializer="he_uniform")(decoder)
+#   autoencoder = Model(inputs=input_layer, outputs=decoder)
+    output = TimeDistributed(Dense(total_data.shape[2]))(decoder) 
     
-#     autoencoder = Model(inputs=input_layer, outputs=output)
+    autoencoder = Model(inputs=input_layer, outputs=output)
     autoencoder.summary()
     encoderModel = Model(input_layer, encoder)
     autoencoder.compile(optimizer='adam', loss = 'mse', metrics=['accuracy'])
@@ -145,25 +158,6 @@ def autoencoder(total_data, activation_fn, num_features, epoch, batch_n):
     encoded_data = encoderModel.predict(total_data)
     autoencoder.save("motionsense_my_autoencoder.h5")
     encoderModel.save("motionsense_my_encoder.h5")
-    return encoded_data
-
-
-def autoencoder2l(total_data, activation_fn, num_features, epoch, batch_n):
-    input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
-    encoder = LSTM(6, return_sequences= True, activation=activation_fn)(input_layer)
-    encoder = LSTM(30, activation=activation_fn)(encoder)
-    decoder = RepeatVector(total_data.shape[1])(encoder)
-    decoder = LSTM(30, return_sequences=True, activation=activation_fn)(decoder)
-    decoder = LSTM(6, return_sequences=True, 
-                   activation=activation_fn)(decoder)
-    output = TimeDistributed(Dense(total_data.shape[2]))(decoder) 
-    print(total_data.shape[2])
-    autoencoder = Model(inputs=input_layer, outputs=output)
-    autoencoder.summary()
-    encoderModel = Model(input_layer, encoder)
-    autoencoder.compile(optimizer='adam', loss = 'mse', metrics=['accuracy'])
-    autoencoder.fit(total_data, total_data, epochs = epoch, batch_size = batch_n, validation_split=0.2, verbose=1)
-    encoded_data = encoderModel.predict(total_data)
     return encoded_data
 
 
@@ -237,9 +231,7 @@ def classification_Using_LSTM(features, label):
 
 # In[ ]:
 
-print('Loading the model')
-load_model = tensorflow.keras.models.load_model("motionsense_my_encoder4096.h5")
-encoded_data = load_model.predict(test_data)
+encoded_data = autoencoder(test_features, 'sigmoid', 180, 20, 8)
 
 
 # In[ ]:

@@ -71,7 +71,7 @@ test_activities = ['Walking', 'Jogging', 'Sitting',
 
 
 #Windowing variables
-time_step = 10
+time_step = 2
 window_size = 200
 
 
@@ -462,6 +462,34 @@ def data_Extract(filename, activities):
     return extracted_data, extracted_label
 
 
+# In[12]:
+
+
+def autoencoder(total_data, activation_fn, num_features, epoch, batch_n):
+    input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
+    encoder = LSTM((num_features*2), activation=activation_fn, kernel_initializer="he_uniform")(input_layer)
+    encoder = LSTM(num_features, activation=activation_fn, kernel_initializer="he_uniform")(encoder)
+    decoder = RepeatVector(total_data.shape[1])(encoder)
+    decoder = LSTM(num_features, return_sequences=True, 
+                   activation=activation_fn, kernel_initializer="he_uniform")(decoder)
+    decoder = LSTM((num_features*2), return_sequences=True, 
+                   activation=activation_fn, kernel_initializer="he_uniform")(decoder)
+#   autoencoder = Model(inputs=input_layer, outputs=decoder)
+    output = TimeDistributed(Dense(total_data.shape[2]))(decoder) 
+    
+    autoencoder = Model(inputs=input_layer, outputs=output)
+    autoencoder.summary()
+    encoderModel = Model(input_layer, encoder)
+    autoencoder.compile(optimizer='adam', loss = 'mse', metrics=['accuracy'])
+    autoencoder.fit(total_data, total_data, epochs = epoch, batch_size = batch_n, validation_split=0.2, verbose=1)
+    encoded_data = encoderModel.predict(total_data)
+    autoencoder.save("motionsense_my_autoencoder.h5")
+    encoderModel.save("motionsense_my_encoder.h5")
+    return encoded_data
+
+  
+
+
 # In[7]:
 
 
@@ -477,106 +505,60 @@ print(test_data.shape)
 
 #Function calls for all the features for different files
 
-# mean_test_data = feature_Mean(test_data)
+mean_test_data = feature_Mean(test_data)
 
 
-# std_test_data  = feature_Standard_Deviation(test_data)
+std_test_data  = feature_Standard_Deviation(test_data)
 
 
-# var_test_data = feature_Variance(test_data)
+var_test_data = feature_Variance(test_data)
 
 
-# ent_test_data = feature_Entropy(test_data)
+ent_test_data = feature_Entropy(test_data)
 
 
-# abdev_test_data = feature_Median_Absolute_Deviation(test_data)
+abdev_test_data = feature_Median_Absolute_Deviation(test_data)
 
-# maxpeak_test_data = feature_Max_Peak(test_data)
-
-
-# minpeak_test_data = feature_Min_Peak(test_data)
+maxpeak_test_data = feature_Max_Peak(test_data)
 
 
-# cor_test_data = feature_correlation(np.nan_to_num(test_data))
+minpeak_test_data = feature_Min_Peak(test_data)
 
 
-# fft_test_data = feature_FFT(test_data)
+cor_test_data = feature_correlation(np.nan_to_num(test_data))
+
+
+fft_test_data = feature_FFT(test_data)
 
 
 # In[9]:
 
 
-# test_features = np.hstack((mean_test_data, std_test_data, var_test_data,
-#                           cor_test_data, abdev_test_data, maxpeak_test_data, 
-#                           minpeak_test_data, fft_test_data))
+test_features = np.hstack((mean_test_data, std_test_data, var_test_data,
+                          cor_test_data, abdev_test_data, maxpeak_test_data, 
+                          minpeak_test_data, fft_test_data))
 
-# label = np.asarray(label)
+label = np.asarray(label)
 
-# predict, y_test = classification_Using_SVM(np.nan_to_num(test_features), label)
+predict, y_test = classification_Using_SVM(np.nan_to_num(test_features), label)
 
 
 # In[10]:
 
 
-# print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-# print(metrics.classification_report(y_test, predict, labels=test_activities))
-# confusion_Matrix(y_test, predict, test_activities, " Feature-based method_W2")
+print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
+print(metrics.classification_report(y_test, predict, labels=test_activities))
+confusion_Matrix(y_test, predict, test_activities, " Feature-based method_W2")
 
 
 # ## Autoencoder
-
-# In[11]:
-
-
-# total_data = test_data
-
-
-# In[12]:
-
-
-def autoencoder(total_data, activation_fn, num_features, epoch, batch_n):
-    input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
-    encoder = LSTM(num_features, activation=activation_fn, kernel_initializer="he_uniform")(input_layer)
-    #encoder = LSTM(180, activation='sigmoid')(encoder)
-    decoder = RepeatVector(total_data.shape[1])(encoder)
-    #decoder = LSTM(96, return_sequences=True, 
-    #               activation='sigmoid')(decoder)
-    decoder = LSTM(total_data.shape[2], return_sequences=True, 
-                   activation=activation_fn, kernel_initializer="he_uniform")(decoder)
-    autoencoder = Model(inputs=input_layer, outputs=decoder)
-    autoencoder.summary()
-    encoderModel = Model(input_layer, encoder)
-    autoencoder.compile(optimizer='adam', loss = 'categorical_crossentropy', metrics=['accuracy'])
-    autoencoder.fit(total_data, total_data, epochs = epoch, batch_size = batch_n, verbose=1)
-    encoded_data = encoderModel.predict(total_data)
-    return encoded_data
-
-def autoencoder2l(total_data, activation_fn, num_features, epoch, batch_n):
-    input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
-    encoder = LSTM(int(num_features/2), return_sequences= True, activation=activation_fn)(input_layer)
-    encoder = LSTM(num_features, activation=activation_fn)(encoder)
-    decoder = RepeatVector(total_data.shape[1])(encoder)
-    decoder = LSTM(int(num_features/2), return_sequences=True, activation=activation_fn)(decoder)
-    decoder = LSTM(total_data.shape[2], return_sequences=True, 
-                   activation=activation_fn)(decoder)
-    autoencoder = Model(inputs=input_layer, outputs=decoder)
-    autoencoder.summary()
-    encoderModel = Model(input_layer, encoder)
-    autoencoder.compile(optimizer='adam', loss = 'categorical_crossentropy', metrics=['accuracy'])
-    autoencoder.fit(total_data, total_data, epochs = epoch, batch_size = batch_n, verbose=1)
-    encoded_data = encoderModel.predict(total_data)
-    autoencoder.save("my_autoencoder_w2")
-    encoderModel.save("my_encoder_w2")
-    return encoded_data
-    
-
 
 # In[13]:
 
 
 label = np.asarray(label)
 
-encoded_data = autoencoder(test_data, 'sigmoid', 180, 10, 8)
+encoded_data = autoencoder(test_data, 'sigmoid', 180, 20, 8)
 
 predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
 

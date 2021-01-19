@@ -1,7 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# ## Working code
+# 
+# ### Created on Thursday  October 22, 2020
+# 
+# ### Author: Ganesamanian Kolappan
+# 
+
+# ## Importing libraries
+# 
+
+# ##### Importing the libraries to be used in the whole application, for the neatness of the code all the imports are done at the start of the coding.
 
 # In[ ]:
 
@@ -29,20 +38,26 @@ from keras.layers import Dense, Dropout, Activation, LSTM, Input, RepeatVector, 
 
 # In[ ]:
 
+#Data path
 
 root = 'datasets/motion-sense-master/data/'
+
+#Windowing variables
 window_size = 350
 time_step  = 10
 
 
 # In[ ]:
 
+#Normaliser since the dataset is not normalized before
 
 def min_max_scaler(df):
 #     return (df-df.min(axis=0))/(df.max(axis=0)-df.min(axis=0))
 #     return df/df.max(axis=0)
     return (df-df.mean(axis=0))/df.std(axis=0) 
 
+#Converting the data to 2D to 3D 
+#(used for LSTM if it executed for classification)
 
 def convert_2D_3D(features, label):
     X_local = []
@@ -140,7 +155,7 @@ def motionsense_Extract(subset_data):
 
 # In[ ]:
 
-
+# The below function block is adopted from the Motionsense datastet's author's Github
 def get_ds_infos():
     """
     Read the file includes data subject information.
@@ -161,6 +176,9 @@ def get_ds_infos():
     
     return dss
 
+# The below function block is adopted from the Motionsense datastet's author's Github
+
+
 def set_data_types(data_types=["userAcceleration"]):
     """
     Select the sensors and the mode to shape the final dataset.
@@ -179,6 +197,8 @@ def set_data_types(data_types=["userAcceleration"]):
             dt_list.append([t+".roll", t+".pitch", t+".yaw"])
 
     return dt_list
+
+# The below function block is adopted from the Motionsense datastet's author's Github
 
 
 def creat_time_series(dt_list, act_labels, trial_codes, mode="mag", labeled=True):
@@ -268,36 +288,6 @@ dataset = creat_time_series(dt_list, act_labels, trial_codes, mode="raw", labele
 print("[INFO] -- Shape of time-Series dataset:"+str(dataset.shape))    
 dataset.tail()
 
-
-# In[ ]:
-
-
-dataset['act'] = dataset['act'].map({0.0:'Downstairs',
-                                     1.0:'Upstairs',
-                                     2.0:'Walking',
-                                     3.0:'Jogging',
-                                     4.0:'Standing',
-                                     5.0:'Sitting'})
-
-
-# In[ ]:
-
-
-extracted_data, extracted_label = motionsense_Extract(dataset)
-test_data = np.asarray(extracted_data)
-print("Shape of the data after sliding window")
-print(test_data.shape)
-# extracted_data[:10]
-
-#with open("motionsense_data_"+str(time_step)+"_"+str(window_size)+".pkl", "rb") as f:
-#    test_data = np.asarray(pickle.loads(f.read()))
-
-#with open("motionsense_label_"+str(time_step)+"_"+str(window_size)+".pkl", "rb") as f:
-#    label = np.asarray(pickle.loads(f.read()))
-
-#print("Shape of the data after sliding window")
-#print(test_data.shape)
-
 # In[ ]:
 
 
@@ -333,7 +323,7 @@ def FFT(data, n_predict):
         #Getting amplitude and phase
         amplitude = np.absolute(data_freqdom[i]) / n         
         phase = np.angle(data_freqdom[i])                  
-        a = amplitude * np.cos(2 * np.pi * f[i] * t + phase)
+        a = amplitude * (np.cos(2 * np.pi * f[i] * t + phase) + np.sin(2 * np.pi * f[i] * t + phase))
               
         if j%4==0:
             amplitude_list.append(amplitude)
@@ -494,7 +484,7 @@ def feature_FFT(data):
 
                
     return fft_data
-# Function to call the FFT feature extraction function
+# Function to call the DCT feature extraction function
 def feature_DCT(data):
 #     fft_data = np.zeros((data.shape[0], data.shape[-1]*2))
     dct_data = np.zeros((data.shape[0], data.shape[-1]))
@@ -548,146 +538,29 @@ def confusion_Matrix(y_test, predict, activities, title):
     plt.show()
     
 
-
-# In[ ]:
-
-
-#Function calls for all the features for different files
-# print("Extracting Features")
-
-# mean_test_data = feature_Mean(test_data)
-# print("Mean calculated")
-
-
-# std_test_data  = feature_Standard_Deviation(test_data)
-# print("Standard Deviation calculated")
-
-
-# var_test_data = feature_Variance(test_data)
-# print("Variance calculated")
-
-
-# ent_test_data = feature_Entropy(test_data)
-# print("Entropy calculated")
-
-
-# abdev_test_data = feature_Median_Absolute_Deviation(test_data)
-# print("Absolute Deviation calculated")
-
-# maxpeak_test_data = feature_Max_Peak(test_data)
-# print("Max peak calculated")
-
-
-# minpeak_test_data = feature_Min_Peak(test_data)
-# print("Min peak calculated")
-
-
-# cor_test_data = feature_correlation(np.nan_to_num(test_data))
-# print("Correlation calculated")
-
-
-# fft_test_data = feature_FFT(test_data)
-# print("FFT calculated")
-
-# dct_test_data = feature_DCT(test_data)
-# print("DCT calculated")
-
-
-# In[ ]:
-
-
-# with open("motionsense_fft_data_"+str(time_step)+"_"+str(window_size)+".pkl", "wb") as f:
-#     f.write(pickle.dumps(fft_test_data))
-# with open("motionsense_dct_data_"+str(time_step)+"_"+str(window_size)+".pkl", "wb") as f:
-#     f.write(pickle.dumps(dct_test_data))
-
-
-# In[ ]:
-
-
-# test_features = np.hstack((mean_test_data, std_test_data, var_test_data,
-#                           cor_test_data, abdev_test_data, maxpeak_test_data, 
-#                           minpeak_test_data, fft_test_data ))
-
-
-# label = np.asarray(extracted_label)
-
-# predict, y_test = classification_Using_SVM(np.nan_to_num(test_features), label)
-
-
-# In[ ]:
-
-
-#with open("motionsense_data_"+str(time_step)+"_"+str(window_size)+".pkl", "wb") as f:
-#    f.write(pickle.dumps(extracted_data))
-#with open("motionsense_label_"+str(time_step)+"_"+str(window_size)+".pkl", "wb") as f:
-#    f.write(pickle.dumps(extracted_label))
-
-
-# In[ ]:
-
-
-test_activities = ['Walking', 'Jogging', 'Sitting',
-                   'Standing', 'Upstairs', 'Downstairs']
-
-
-# In[ ]:
-
-
-label = np.asarray(extracted_label)
-
-
-# In[ ]:
-
-
-# print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-# print(metrics.classification_report(y_test, predict, labels=test_activities))
-# confusion_Matrix(y_test, predict, test_activities, " Feature-based method")
-
-
 # In[ ]:
 
 
 def autoencoder(total_data, activation_fn, num_features, epoch, batch_n):
     input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
-    encoder = LSTM(num_features, activation=activation_fn, kernel_initializer="he_uniform")(input_layer)
-    #encoder = LSTM(180, activation='sigmoid')(encoder)
+    encoder = LSTM((num_features*2), activation=activation_fn, kernel_initializer="he_uniform")(input_layer)
+    encoder = LSTM(num_features, activation=activation_fn, kernel_initializer="he_uniform")(encoder)
     decoder = RepeatVector(total_data.shape[1])(encoder)
-    #decoder = LSTM(96, return_sequences=True, 
-    #               activation='sigmoid')(decoder)
-    decoder = LSTM(total_data.shape[2], return_sequences=True, 
-                   activation=activation_fn,kernel_initializer="he_uniform")(decoder)
-    autoencoder = Model(inputs=input_layer, outputs=decoder)
-#     output = TimeDistributed(Dense(total_data.shape[2]))(decoder) 
-    
-#     autoencoder = Model(inputs=input_layer, outputs=output)
-    autoencoder.summary()
-    encoderModel = Model(input_layer, encoder)
-    autoencoder.compile(optimizer='adam', loss = 'mse', metrics=['accuracy'])
-    autoencoder.fit(total_data, total_data, epochs = epoch, batch_size = batch_n, validation_split=0.2, verbose=1)
-    #print("Saving the model")
-    encoded_data = encoderModel.predict(total_data)
-    #autoencoder.save("motionsense_my_autoencoder"+str(batch_n)+".h5")
-    #encoderModel.save("motionsense_my_encoder"+str(batch_n)+".h5")
-    return encoded_data
-
-
-def autoencoder2l(total_data, activation_fn, num_features, epoch, batch_n):
-    input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
-    encoder = LSTM(6, return_sequences= True, activation=activation_fn, kernel_initializer="he_uniform")(input_layer)
-    encoder = LSTM(30, activation=activation_fn)(encoder)
-    decoder = RepeatVector(total_data.shape[1])(encoder)
-    decoder = LSTM(30, return_sequences=True, activation=activation_fn, kernel_initializer="he_uniform")(decoder)
-    decoder = LSTM(6, return_sequences=True, 
-                   activation=activation_fn)(decoder)
+    decoder = LSTM(num_features, return_sequences=True, 
+                   activation=activation_fn, kernel_initializer="he_uniform")(decoder)
+    decoder = LSTM((num_features*2), return_sequences=True, 
+                   activation=activation_fn, kernel_initializer="he_uniform")(decoder)
+#   autoencoder = Model(inputs=input_layer, outputs=decoder)
     output = TimeDistributed(Dense(total_data.shape[2]))(decoder) 
-    print(total_data.shape[2])
+    
     autoencoder = Model(inputs=input_layer, outputs=output)
     autoencoder.summary()
     encoderModel = Model(input_layer, encoder)
     autoencoder.compile(optimizer='adam', loss = 'mse', metrics=['accuracy'])
     autoencoder.fit(total_data, total_data, epochs = epoch, batch_size = batch_n, validation_split=0.2, verbose=1)
     encoded_data = encoderModel.predict(total_data)
+    autoencoder.save("motionsense_my_autoencoder.h5")
+    encoderModel.save("motionsense_my_encoder.h5")
     return encoded_data
 
 
@@ -760,67 +633,131 @@ def classification_Using_LSTM(features, label):
 
 
 # In[ ]:
-# maxnum_feature=300
-# accuracy = np.zeros(maxnum_feature)
-# loss = np.zeros(maxnum_feature)
-# for i in range(1, maxnum_feature+1):
-#     encoded_data = autoencoder(test_data, 'sigmoid', i, 1, 32)
-#     print("Done calculated for : {}".format(i))
-#     predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
-#     accuracy[i] = metrics.accuracy_score(y_test, predict)
-#     loss[i] = 100-accuracy[i]
-#     with open("motionsense_accuracy_he.pkl", "wb") as f:
-#         f.write(pickle.dumps(accuracy))
-#     with open("motionsense_loss_he.pkl", "wb") as f:
-#         f.write(pickle.dumps(loss))
 
-# encoded_data = autoencoder(test_data, 'sigmoid', 180, 10, 64)
-# predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
-# print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-# print(metrics.classification_report(y_test, predict, labels=test_activities))
-# confusion_Matrix(y_test, predict, test_activities, " autoencoders 64")
-# # In[ ]:
+# class names
+dataset['act'] = dataset['act'].map({0.0:'Downstairs',
+                                     1.0:'Upstairs',
+                                     2.0:'Walking',
+                                     3.0:'Jogging',
+                                     4.0:'Standing',
+                                     5.0:'Sitting'})
 
-# encoded_data = autoencoder(test_data, 'sigmoid', 180, 10, 32)
-# predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
-# print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-# print(metrics.classification_report(y_test, predict, labels=test_activities))
-# confusion_Matrix(y_test, predict, test_activities, " autoencoders 32")
-
-# # In[ ]:
-
-# encoded_data = autoencoder(test_data, 'sigmoid', 180, 10, 16)
-# predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
-# print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-# print(metrics.classification_report(y_test, predict, labels=test_activities))
-# confusion_Matrix(y_test, predict, test_activities, " autoencoders 16")
-
-# # In[ ]:
-
-
-# encoded_data = autoencoder(test_data, 'sigmoid', 180, 10, 8)
-# predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
-# print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-# print(metrics.classification_report(y_test, predict, labels=test_activities))
-# confusion_Matrix(y_test, predict, test_activities, " autoencoders 8")
 
 # In[ ]:
 
-print("sigmoid function-180,20")
+
+extracted_data, extracted_label = motionsense_Extract(dataset)
+test_data = np.asarray(extracted_data)
+print("Shape of the data after sliding window")
+print(test_data.shape)
+
+
+#with open("motionsense_data_"+str(time_step)+"_"+str(window_size)+".pkl", "rb") as f:
+#    test_data = np.asarray(pickle.loads(f.read()))
+
+#with open("motionsense_label_"+str(time_step)+"_"+str(window_size)+".pkl", "rb") as f:
+#    label = np.asarray(pickle.loads(f.read()))
+
+
+
+# In[ ]:
+
+
+#Function calls for all the features for different files
+print("Extracting Features")
+
+mean_test_data = feature_Mean(test_data)
+print("Mean calculated")
+
+
+std_test_data  = feature_Standard_Deviation(test_data)
+print("Standard Deviation calculated")
+
+
+var_test_data = feature_Variance(test_data)
+print("Variance calculated")
+
+
+ent_test_data = feature_Entropy(test_data)
+print("Entropy calculated")
+
+
+abdev_test_data = feature_Median_Absolute_Deviation(test_data)
+print("Absolute Deviation calculated")
+
+maxpeak_test_data = feature_Max_Peak(test_data)
+print("Max peak calculated")
+
+
+minpeak_test_data = feature_Min_Peak(test_data)
+print("Min peak calculated")
+
+
+cor_test_data = feature_correlation(np.nan_to_num(test_data))
+print("Correlation calculated")
+
+
+fft_test_data = feature_FFT(test_data)
+print("FFT calculated")
+
+dct_test_data = feature_DCT(test_data)
+print("DCT calculated")
+
+
+# In[ ]:
+
+
+# with open("motionsense_fft_data_"+str(time_step)+"_"+str(window_size)+".pkl", "wb") as f:
+#     f.write(pickle.dumps(fft_test_data))
+# with open("motionsense_dct_data_"+str(time_step)+"_"+str(window_size)+".pkl", "wb") as f:
+#     f.write(pickle.dumps(dct_test_data))
+
+
+# In[ ]:
+
+
+test_features = np.hstack((mean_test_data, std_test_data, var_test_data,
+                          cor_test_data, abdev_test_data, maxpeak_test_data, 
+                          minpeak_test_data, fft_test_data ))
+
+
+label = np.asarray(extracted_label)
+
+predict, y_test = classification_Using_SVM(np.nan_to_num(test_features), label)
+
+
+# In[ ]:
+
+
+#with open("motionsense_data_"+str(time_step)+"_"+str(window_size)+".pkl", "wb") as f:
+#    f.write(pickle.dumps(extracted_data))
+#with open("motionsense_label_"+str(time_step)+"_"+str(window_size)+".pkl", "wb") as f:
+#    f.write(pickle.dumps(extracted_label))
+
+
+# In[ ]:
+
+
+test_activities = ['Walking', 'Jogging', 'Sitting',
+                   'Standing', 'Upstairs', 'Downstairs']
+
+
+# In[ ]:
+
+
+print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
+print(metrics.classification_report(y_test, predict, labels=test_activities))
+confusion_Matrix(y_test, predict, test_activities, " Feature-based method")
+
+
+# In[ ]:
+
 encoded_data = autoencoder(test_data, 'sigmoid', 180, 20, 8)
 predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
 print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
+print(metrics.classification_report(y_test, predict, labels=test_activities))
+confusion_Matrix(y_test, predict, test_activities, " autoencoders")
 
-
-#print("relu function")
-#encoded_data = autoencoder(test_data, 'relu', 180, 1, 64)
-#predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
-#print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-
-#print("tanh function")
-#encoded_data = autoencoder(test_data, 'tanh', 180, 1, 64)
-#predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
-#print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
 
 print('Model trained')
 

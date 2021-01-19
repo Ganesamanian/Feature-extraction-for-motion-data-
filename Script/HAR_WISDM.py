@@ -77,8 +77,8 @@ activities = ['Walking', 'Jogging', 'Climbing Stairs', 'Sitting', 'Standing', 'T
 
 
 #Windowing variables
-time_step = 60
-window_size = 100
+time_step = 2
+window_size = 200
 
 
 # ## Function call- Data Preprocessing
@@ -210,38 +210,11 @@ def visualization_graph(x, y, title, x_name, y_name, color, label):
     plt.yticks(fontsize= 17)
 
 
- 
-
-
-# In[4]:
-
-
-file_path_phone_accel = 'phone/accel/*.txt'
-extracted_phone_accel_data, extracted_phone_accel_label = data_Extraction(folder_path + file_path_phone_accel)
-file_path_phone_gyro = 'phone/gyro/*.txt'
-extracted_phone_gyro_data, extracted_phone_gyro_label = data_Extraction(folder_path + file_path_phone_gyro)
-file_path_watch_accel = 'watch/accel/*.txt'
-extracted_watch_accel_data, extracted_watch_accel_label = data_Extraction(folder_path + file_path_watch_accel)
-file_path_watch_gyro = 'watch/gyro/*.txt'
-extracted_watch_gyro_data, extracted_watch_gyro_label = data_Extraction(folder_path + file_path_watch_gyro)
-
-
-# In[5]:
-
-
-#Printing the shape to visualize the size is same
-
-print(np.asarray(extracted_phone_gyro_data).shape)
-print(np.asarray(extracted_phone_accel_data).shape)
-print(np.asarray(extracted_watch_gyro_data).shape)
-print(np.asarray(extracted_watch_accel_data).shape)
-
+ # In[6]:
 
 # ## Function call - Features
 
 # #### Features are being extracted from the hand made program, the main features that to be concentrated in FFT apart form that mean, variance, standard deviation, entropy, max and min of the peak, correlation between xy, yz, zx is being extracted. From FFT we get two features that is amplitude and phase. 
-
-# In[6]:
 
 
 # Function for extracting amplitude and phase
@@ -379,75 +352,6 @@ def feature_FFT(data):
     return fft_data
     
 
-
-# In[7]:
-
-
-#Function calls for all the features for different files
-
-# mean_phone_accel_data = feature_Mean(np.asarray(extracted_phone_accel_data))
-# mean_phone_gyro_data = feature_Mean(np.asarray(extracted_phone_gyro_data))
-# mean_watch_accel_data = feature_Mean(np.asarray(extracted_watch_accel_data))
-# mean_watch_gyro_data = feature_Mean(np.asarray(extracted_watch_gyro_data))
-
-# std_phone_accel_data  = feature_Standard_Deviation(np.asarray(extracted_phone_accel_data))
-# std_phone_gyro_data  = feature_Standard_Deviation(np.asarray(extracted_phone_gyro_data))
-# std_watch_accel_data  = feature_Standard_Deviation(np.asarray(extracted_watch_accel_data))
-# std_watch_gyro_data  = feature_Standard_Deviation(np.asarray(extracted_watch_gyro_data))
-
-# var_phone_accel_data = feature_Variance(np.asarray(extracted_phone_accel_data))
-# var_phone_gyro_data = feature_Variance(np.asarray(extracted_phone_gyro_data))
-# var_watch_accel_data = feature_Variance(np.asarray(extracted_watch_accel_data))
-# var_watch_gyro_data = feature_Variance(np.asarray(extracted_watch_gyro_data))
-
-# ent_phone_accel_data = feature_Entropy(np.asarray(extracted_phone_accel_data))
-# ent_phone_gyro_data = feature_Entropy(np.asarray(extracted_phone_gyro_data))
-# ent_watch_accel_data = feature_Entropy(np.asarray(extracted_watch_accel_data))
-# ent_watch_gyro_data = feature_Entropy(np.asarray(extracted_watch_gyro_data))
-
-# abdev_phone_accel_data = feature_Median_Absolute_Deviation(np.asarray(extracted_phone_accel_data))
-# abdev_phone_gyro_data = feature_Median_Absolute_Deviation(np.asarray(extracted_phone_gyro_data))
-# abdev_watch_accel_data = feature_Median_Absolute_Deviation(np.asarray(extracted_watch_accel_data))
-# abdev_watch_gyro_data = feature_Median_Absolute_Deviation(np.asarray(extracted_watch_gyro_data))
-
-# maxpeak_phone_accel_data = feature_Max_Peak(np.asarray(extracted_phone_accel_data))
-# maxpeak_phone_gyro_data = feature_Max_Peak(np.asarray(extracted_phone_gyro_data))
-# maxpeak_watch_accel_data = feature_Max_Peak(np.asarray(extracted_watch_accel_data))
-# maxpeak_watch_gyro_data = feature_Max_Peak(np.asarray(extracted_watch_gyro_data))
-
-# minpeak_phone_accel_data = feature_Min_Peak(np.asarray(extracted_phone_accel_data))
-# minpeak_phone_gyro_data = feature_Min_Peak(np.asarray(extracted_phone_gyro_data))
-# minpeak_watch_accel_data = feature_Min_Peak(np.asarray(extracted_watch_accel_data))
-# minpeak_watch_gyro_data = feature_Min_Peak(np.asarray(extracted_watch_gyro_data))
-
-# cor_phone_accel_data = feature_correlation(np.asarray(extracted_phone_accel_data))
-# cor_phone_gyro_data = feature_correlation(np.asarray(extracted_phone_gyro_data))
-# cor_watch_accel_data = feature_correlation(np.asarray(extracted_watch_accel_data))
-# cor_watch_gyro_data = feature_correlation(np.asarray(extracted_watch_gyro_data))
-
-# fft_phone_accel_data = feature_FFT(np.asarray(extracted_phone_accel_data))
-# fft_phone_gyro_data = feature_FFT(np.asarray(extracted_phone_gyro_data))
-# fft_watch_accel_data = feature_FFT(np.asarray(extracted_watch_accel_data))
-# fft_watch_gyro_data = feature_FFT(np.asarray(extracted_watch_gyro_data))
-   
-
-
-# In[8]:
-
-
-#Concatenating the four files based on the feature group
-
-# mean_feature = np.hstack((mean_phone_accel_data, mean_phone_gyro_data, mean_watch_accel_data, mean_watch_gyro_data))
-# variance_feature = np.hstack((var_phone_accel_data, var_phone_gyro_data, var_watch_accel_data, var_watch_gyro_data))
-# std_feature = np.hstack((std_phone_accel_data, std_phone_gyro_data, std_watch_accel_data, std_watch_gyro_data))
-# entropy_feature = np.hstack((ent_phone_accel_data, ent_phone_gyro_data, ent_watch_accel_data, ent_watch_gyro_data))
-# abdev_feature = np.hstack((abdev_phone_accel_data, abdev_phone_gyro_data, abdev_watch_accel_data, abdev_watch_gyro_data))
-# maxpeak_feature = np.hstack((maxpeak_phone_accel_data, maxpeak_phone_gyro_data, maxpeak_watch_accel_data, maxpeak_watch_gyro_data))
-# minpeak_feature = np.hstack((minpeak_phone_accel_data, minpeak_phone_gyro_data, minpeak_watch_accel_data, minpeak_watch_gyro_data))
-# correlation_feature = np.hstack((cor_phone_accel_data, cor_phone_gyro_data, cor_watch_accel_data, cor_watch_gyro_data))
-# fft_feature = np.hstack((fft_phone_accel_data, fft_phone_gyro_data, fft_watch_accel_data, fft_watch_gyro_data))
-
-
 # ## Classification using SVM
 
 # #### SVM is used for classification to know how the extracted features perform
@@ -484,6 +388,124 @@ def confusion_Matrix(y_test, predict, activities, title):
                 bbox_inches = 'tight')
     plt.show()
 
+# In[ ]:
+
+
+def autoencoder(total_data, activation_fn, num_features, epoch, batch_n):
+    input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
+    encoder = LSTM((num_features*2), activation=activation_fn, kernel_initializer="he_uniform")(input_layer)
+    encoder = LSTM(num_features, activation=activation_fn, kernel_initializer="he_uniform")(encoder)
+    decoder = RepeatVector(total_data.shape[1])(encoder)
+    decoder = LSTM(num_features, return_sequences=True, 
+                   activation=activation_fn, kernel_initializer="he_uniform")(decoder)
+    decoder = LSTM((num_features*2), return_sequences=True, 
+                   activation=activation_fn, kernel_initializer="he_uniform")(decoder)
+#   autoencoder = Model(inputs=input_layer, outputs=decoder)
+    output = TimeDistributed(Dense(total_data.shape[2]))(decoder) 
+    
+    autoencoder = Model(inputs=input_layer, outputs=output)
+    autoencoder.summary()
+    encoderModel = Model(input_layer, encoder)
+    autoencoder.compile(optimizer='adam', loss = 'mse', metrics=['accuracy'])
+    autoencoder.fit(total_data, total_data, epochs = epoch, batch_size = batch_n, validation_split=0.2, verbose=1)
+    encoded_data = encoderModel.predict(total_data)
+    autoencoder.save("motionsense_my_autoencoder.h5")
+    encoderModel.save("motionsense_my_encoder.h5")
+    return encoded_data
+
+# In[4]:
+
+
+file_path_phone_accel = 'phone/accel/*.txt'
+extracted_phone_accel_data, extracted_phone_accel_label = data_Extraction(folder_path + file_path_phone_accel)
+file_path_phone_gyro = 'phone/gyro/*.txt'
+extracted_phone_gyro_data, extracted_phone_gyro_label = data_Extraction(folder_path + file_path_phone_gyro)
+file_path_watch_accel = 'watch/accel/*.txt'
+extracted_watch_accel_data, extracted_watch_accel_label = data_Extraction(folder_path + file_path_watch_accel)
+file_path_watch_gyro = 'watch/gyro/*.txt'
+extracted_watch_gyro_data, extracted_watch_gyro_label = data_Extraction(folder_path + file_path_watch_gyro)
+
+
+# In[5]:
+
+
+#Printing the shape to visualize the size is same
+
+print(np.asarray(extracted_phone_gyro_data).shape)
+print(np.asarray(extracted_phone_accel_data).shape)
+print(np.asarray(extracted_watch_gyro_data).shape)
+print(np.asarray(extracted_watch_accel_data).shape)
+
+
+
+# In[7]:
+
+
+#Function calls for all the features for different files
+
+mean_phone_accel_data = feature_Mean(np.asarray(extracted_phone_accel_data))
+mean_phone_gyro_data = feature_Mean(np.asarray(extracted_phone_gyro_data))
+mean_watch_accel_data = feature_Mean(np.asarray(extracted_watch_accel_data))
+mean_watch_gyro_data = feature_Mean(np.asarray(extracted_watch_gyro_data))
+
+std_phone_accel_data  = feature_Standard_Deviation(np.asarray(extracted_phone_accel_data))
+std_phone_gyro_data  = feature_Standard_Deviation(np.asarray(extracted_phone_gyro_data))
+std_watch_accel_data  = feature_Standard_Deviation(np.asarray(extracted_watch_accel_data))
+std_watch_gyro_data  = feature_Standard_Deviation(np.asarray(extracted_watch_gyro_data))
+
+var_phone_accel_data = feature_Variance(np.asarray(extracted_phone_accel_data))
+var_phone_gyro_data = feature_Variance(np.asarray(extracted_phone_gyro_data))
+var_watch_accel_data = feature_Variance(np.asarray(extracted_watch_accel_data))
+var_watch_gyro_data = feature_Variance(np.asarray(extracted_watch_gyro_data))
+
+ent_phone_accel_data = feature_Entropy(np.asarray(extracted_phone_accel_data))
+ent_phone_gyro_data = feature_Entropy(np.asarray(extracted_phone_gyro_data))
+ent_watch_accel_data = feature_Entropy(np.asarray(extracted_watch_accel_data))
+ent_watch_gyro_data = feature_Entropy(np.asarray(extracted_watch_gyro_data))
+
+abdev_phone_accel_data = feature_Median_Absolute_Deviation(np.asarray(extracted_phone_accel_data))
+abdev_phone_gyro_data = feature_Median_Absolute_Deviation(np.asarray(extracted_phone_gyro_data))
+abdev_watch_accel_data = feature_Median_Absolute_Deviation(np.asarray(extracted_watch_accel_data))
+abdev_watch_gyro_data = feature_Median_Absolute_Deviation(np.asarray(extracted_watch_gyro_data))
+
+maxpeak_phone_accel_data = feature_Max_Peak(np.asarray(extracted_phone_accel_data))
+maxpeak_phone_gyro_data = feature_Max_Peak(np.asarray(extracted_phone_gyro_data))
+maxpeak_watch_accel_data = feature_Max_Peak(np.asarray(extracted_watch_accel_data))
+maxpeak_watch_gyro_data = feature_Max_Peak(np.asarray(extracted_watch_gyro_data))
+
+minpeak_phone_accel_data = feature_Min_Peak(np.asarray(extracted_phone_accel_data))
+minpeak_phone_gyro_data = feature_Min_Peak(np.asarray(extracted_phone_gyro_data))
+minpeak_watch_accel_data = feature_Min_Peak(np.asarray(extracted_watch_accel_data))
+minpeak_watch_gyro_data = feature_Min_Peak(np.asarray(extracted_watch_gyro_data))
+
+cor_phone_accel_data = feature_correlation(np.asarray(extracted_phone_accel_data))
+cor_phone_gyro_data = feature_correlation(np.asarray(extracted_phone_gyro_data))
+cor_watch_accel_data = feature_correlation(np.asarray(extracted_watch_accel_data))
+cor_watch_gyro_data = feature_correlation(np.asarray(extracted_watch_gyro_data))
+
+fft_phone_accel_data = feature_FFT(np.asarray(extracted_phone_accel_data))
+fft_phone_gyro_data = feature_FFT(np.asarray(extracted_phone_gyro_data))
+fft_watch_accel_data = feature_FFT(np.asarray(extracted_watch_accel_data))
+fft_watch_gyro_data = feature_FFT(np.asarray(extracted_watch_gyro_data))
+   
+
+
+# In[8]:
+
+
+#Concatenating the four files based on the feature group
+
+mean_feature = np.hstack((mean_phone_accel_data, mean_phone_gyro_data, mean_watch_accel_data, mean_watch_gyro_data))
+variance_feature = np.hstack((var_phone_accel_data, var_phone_gyro_data, var_watch_accel_data, var_watch_gyro_data))
+std_feature = np.hstack((std_phone_accel_data, std_phone_gyro_data, std_watch_accel_data, std_watch_gyro_data))
+entropy_feature = np.hstack((ent_phone_accel_data, ent_phone_gyro_data, ent_watch_accel_data, ent_watch_gyro_data))
+abdev_feature = np.hstack((abdev_phone_accel_data, abdev_phone_gyro_data, abdev_watch_accel_data, abdev_watch_gyro_data))
+maxpeak_feature = np.hstack((maxpeak_phone_accel_data, maxpeak_phone_gyro_data, maxpeak_watch_accel_data, maxpeak_watch_gyro_data))
+minpeak_feature = np.hstack((minpeak_phone_accel_data, minpeak_phone_gyro_data, minpeak_watch_accel_data, minpeak_watch_gyro_data))
+correlation_feature = np.hstack((cor_phone_accel_data, cor_phone_gyro_data, cor_watch_accel_data, cor_watch_gyro_data))
+fft_feature = np.hstack((fft_phone_accel_data, fft_phone_gyro_data, fft_watch_accel_data, fft_watch_gyro_data))
+
+
 
 # ## All the Features
 
@@ -494,24 +516,24 @@ def confusion_Matrix(y_test, predict, activities, title):
 
 # Concatenating all the features
 
-# features = np.hstack((mean_feature, variance_feature, np.nan_to_num(entropy_feature),
-#                       abdev_feature, maxpeak_feature, minpeak_feature, std_feature,
-#                       correlation_feature, fft_feature))
-# print(features.shape)
+features = np.hstack((mean_feature, variance_feature, np.nan_to_num(entropy_feature),
+                      abdev_feature, maxpeak_feature, minpeak_feature, std_feature,
+                      correlation_feature, fft_feature))
+print(features.shape)
 
 #Class label
-# label = np.asarray(extracted_phone_accel_label)
+label = np.asarray(extracted_phone_accel_label)
 
-# predict, y_test = classification_Using_SVM(features, label)
+predict, y_test = classification_Using_SVM(features, label)
 
-# print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-# print(metrics.classification_report(y_test, predict, labels=activities))
+print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
+print(metrics.classification_report(y_test, predict, labels=activities))
 
 
 # In[11]:
 
 
-# confusion_Matrix(y_test, predict, activities, " Feature-based method")
+confusion_Matrix(y_test, predict, activities, " Feature-based method")
 
 
 # #### Accuracy is 5%  from all features since the entropy contains huge values, this makes the classifier to learn incorrectly. So the entropy feature doesn't hold nay good.
@@ -523,22 +545,22 @@ def confusion_Matrix(y_test, predict, activities, title):
 # In[12]:
 
 
-# features = np.hstack((mean_feature, variance_feature, std_feature,
-#                       abdev_feature, maxpeak_feature, minpeak_feature,
-#                       correlation_feature, fft_feature))
+features = np.hstack((mean_feature, variance_feature, std_feature,
+                      abdev_feature, maxpeak_feature, minpeak_feature,
+                      correlation_feature, fft_feature))
 
-# label = np.asarray(extracted_phone_accel_label)
+label = np.asarray(extracted_phone_accel_label)
 
-# predict, y_test = classification_Using_SVM(features, label)
+predict, y_test = classification_Using_SVM(features, label)
 
-# print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
-# print(metrics.classification_report(y_test, predict, labels=activities))
+print('Accuracy score: {}'.format(metrics.accuracy_score(y_test, predict)))
+print(metrics.classification_report(y_test, predict, labels=activities))
 
 
 # In[14]:
 
 
-# confusion_Matrix(y_test, predict, activities, " Feature-based method")
+confusion_Matrix(y_test, predict, activities, " Feature-based method")
 
 
 # ## Autoencoder
@@ -556,50 +578,11 @@ total_data = np.concatenate((extracted_phone_accel_data,
 # In[ ]:
 
 
-def autoencoder(total_data, activation_fn, num_features, epoch, batch_n):
-    input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
-    encoder = LSTM(num_features, activation=activation_fn, kernel_initializer="he_uniform")(input_layer)
-    #encoder = LSTM(180, activation='sigmoid')(encoder)
-    decoder = RepeatVector(total_data.shape[1])(encoder)
-    #decoder = LSTM(96, return_sequences=True, 
-    #               activation='sigmoid')(decoder)
-    decoder = LSTM(total_data.shape[2], return_sequences=True, 
-                   activation=activation_fn, kernel_initializer="he_uniform")(decoder)
-    autoencoder = Model(inputs=input_layer, outputs=decoder)
-    autoencoder.summary()
-    encoderModel = Model(input_layer, encoder)
-    autoencoder.compile(optimizer='adam', loss = 'categorical_crossentropy', metrics=['accuracy'])
-    autoencoder.fit(total_data, total_data, epochs = epoch, batch_size = batch_n, verbose=1)
-    encoded_data = encoderModel.predict(total_data)
-    return encoded_data
-
-# def autoencoder2l(total_data, activation_fn, num_features, epoch, batch_n):
-#     input_layer = Input(shape=(total_data.shape[1],total_data.shape[2], ))
-#     encoder = LSTM(int(num_features/2), return_sequences= True, activation=activation_fn)(input_layer)
-#     encoder = LSTM(num_features, activation=activation_fn)(encoder)
-#     decoder = RepeatVector(total_data.shape[1])(encoder)
-#     decoder = LSTM(int(num_features/2), return_sequences=True, activation=activation_fn)(decoder)
-#     decoder = LSTM(total_data.shape[2], return_sequences=True, 
-#                    activation=activation_fn)(decoder)
-#     autoencoder = Model(inputs=input_layer, outputs=decoder)
-#     autoencoder.summary()
-#     encoderModel = Model(input_layer, encoder)
-#     autoencoder.compile(optimizer='adam', loss = 'categorical_crossentropy', metrics=['accuracy'])
-#     autoencoder.fit(total_data, total_data, epochs = epoch, batch_size = batch_n, verbose=1)
-#     encoded_data = encoderModel.predict(total_data)
-#     return encoded_data
-    
-
-
-# In[ ]:
-
-
 label = np.asarray(extracted_phone_accel_label)
-encoded_data = autoencoder(total_data, 'sigmoid', 180, 10, 32)
+encoded_data = autoencoder(total_data, 'sigmoid', 180, 20, 8)
 
 predict, y_test = classification_Using_SVM(np.nan_to_num(encoded_data), label)
-with open("WISDM_auto_features.pkl", "wb") as f:
-    f.write(pickle.dumps(encoded_data))
+
 
 # In[ ]:
 
