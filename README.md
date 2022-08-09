@@ -1,6 +1,7 @@
 # Feature-Extraction-for-Motion-Data-
 
-This repository contains a implementation of Autoencoders and FFT for feature extraction from motion data.
+This repository contains a implementation of Autoencoders and FFT for feature extraction from motion data. A detailed report and slides available 
+[at](https://github.com/Ganesamanian/Feature-extraction-for-motion-data-/tree/main/Report)
 
 
 # Abstract
